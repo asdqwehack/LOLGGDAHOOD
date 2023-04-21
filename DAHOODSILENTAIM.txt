@@ -1,7 +1,7 @@
 --// PATCHED DONT EVEN BOTHER
 getgenv().FovKey = "n"
 
-game:GetService("StarterGui"):SetCore("SendNotification", {Title = "DISCORD", Text = "PRIME#0613", Duration = 10,})
+game:GetService("StarterGui"):SetCore("SendNotification", {Title = "DISCORD", Text = "FUCK YOU", Duration = 10,})
 
 getgenv().Parts = {"HumanoidRootPart"} -- {"Head", "HumanoidRootPart"}
 
