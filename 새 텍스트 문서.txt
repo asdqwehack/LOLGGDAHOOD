@@ -1,0 +1,349 @@
+--// PATCHED DONT EVEN BOTHER
+getgenv().FovKey = "n"
+
+game:GetService("StarterGui"):SetCore("SendNotification", {Title = "DISCORD", Text = "PRIME#0613", Duration = 10,})
+
+getgenv().Parts = {"HumanoidRootPart"} -- {"Head", "HumanoidRootPart"}
+
+getgenv().Hitchance = 100
+
+getgenv().Fov = 70 -- semi legit Rev: 9, 8, 8.5, 7.6, 7.5, 7.3
+                   -- Rev(far): 7, 6.7, 6.4, 5.6, 5.3
+                   -- Shotgun: 12, 11, 10, 10.5, 9.8, 9.4,
+                   ------------------
+                   -- legit star =
+                   -- Rev: 6, 5.7, 5.5, 5.2, 5, 4.8, 4.6, 4.3, 4 
+                   -- Rev(far): 4, 3.8, 3.6, 3.4, 3.2, 3, 2.8
+                   -- Shotgun: 7, 6.8, 6.7, 6.5, 6.3, 6.1, 6, 5.7, 5.5, 5.3
+
+getgenv().ShowFOV = true
+
+----------------------------------
+local Aiming = loadstring(game:HttpGet("https://pastebin.com/raw/YVm7w1AC"))()
+Aiming.ShowFOV = getgenv().ShowFOV
+Aiming.TargetPart = getgenv().Parts
+Aiming.HitChance = getgenv().Hitchance
+Aiming.TeamCheck(false)
+Aiming.ShowFov = false
+ 
+ 
+ 
+local Workspace = game:GetService("Workspace")
+ 
+local Players = game:GetService("Players")
+ 
+local RunService = game:GetService("RunService")
+ 
+local UserInputService = game:GetService("UserInputService")
+ 
+ 
+ 
+local LocalPlayer = Players.LocalPlayer
+ 
+local Mouse = LocalPlayer:GetMouse()
+ 
+local CurrentCamera = Workspace.CurrentCamera
+ 
+ 
+ local DaHoodSettings = {
+ 
+    SilentAim = true,
+ 
+    AimLock = false,
+ 
+    Prediction = 0.119,
+ 
+    AimLockKeybind = Enum.KeyCode.E,
+ 
+    Resolver = true,
+ 
+}
+ 
+getgenv().DaHoodSettings = DaHoodSettings
+
+ 
+ 
+ 
+ 
+ 
+function Aiming.Check()
+ 
+    if not (Aiming.Enabled == true and Aiming.Selected ~= LocalPlayer and Aiming.SelectedPart ~= nil) then
+ 
+        return false
+ 
+    end
+ 
+    local Character = Aiming.Character(Aiming.Selected)
+ 
+    local KOd = Character:WaitForChild("BodyEffects")["K.O"].Value
+ 
+    local Grabbed = Character:FindFirstChild("GRABBING_CONSTRAINT") ~= nil
+ 
+    if (KOd or Grabbed) then
+ 
+        return false
+ 
+    end
+ 
+    return true
+ 
+end
+ 
+ 
+
+task.spawn(function()
+ 
+    while task.wait() do
+ 
+        if DaHoodSettings.Resolver and Aiming.Selected ~= nil and (Aiming.Selected.Character)  then
+ 
+            local oldVel = game.Players[Aiming.Selected.Name].Character.HumanoidRootPart.Velocity
+ 
+            game.Players[Aiming.Selected.Name].Character.HumanoidRootPart.Velocity = Vector3.new(oldVel.X, -0, oldVel.Z)
+ 
+        end 
+ 
+    end
+ 
+end)
+ 
+local Script = {Functions = {}}
+ 
+ 
+ 
+Script.Functions.getToolName = function(name)
+ 
+    local split = string.split(string.split(name, "[")[2], "]")[1]
+ 
+    return split
+ 
+end
+ 
+ 
+ 
+Script.Functions.getEquippedWeaponName = function(player)
+ 
+   if (player.Character) and player.Character:FindFirstChildWhichIsA("Tool") then
+ 
+      local Tool =  player.Character:FindFirstChildWhichIsA("Tool")
+ 
+      if string.find(Tool.Name, "%[") and string.find(Tool.Name, "%]") and not string.find(Tool.Name, "Wallet") and not string.find(Tool.Name, "Phone") then 
+ 
+         return Script.Functions.getToolName(Tool.Name)
+ 
+      end
+ 
+   end
+ 
+   return nil
+ 
+end
+ 
+ 
+ 
+game:GetService("RunService").RenderStepped:Connect(function()
+ 
+    if Script.Functions.getEquippedWeaponName(game.Players.LocalPlayer) ~= nil then
+ 
+        local WeaponSettings = GunSettings[Script.Functions.getEquippedWeaponName(game.Players.LocalPlayer)]
+ 
+        if WeaponSettings ~= nil then
+ 
+            Aiming.FOV = WeaponSettings.FOV
+ 
+        else
+ 
+            Aiming.FOV = 10
+ 
+        end
+ 
+    end    
+ 
+end)
+ 
+ 
+ 
+local __index
+ 
+__index = hookmetamethod(game, "__index", function(t, k)
+ 
+    if (t:IsA("Mouse") and (k == "Hit" or k == "Target") and Aiming.Check()) then
+ 
+        local SelectedPart = Aiming.SelectedPart
+ 
+        if (DaHoodSettings.SilentAim and (k == "Hit" or k == "Target")) then
+ 
+            local Hit = SelectedPart.CFrame + (SelectedPart.Velocity * DaHoodSettings.Prediction)
+ 
+            return (k == "Hit" and Hit or SelectedPart)
+ 
+        end
+ 
+    end
+ 
+ 
+ 
+    return __index(t, k)
+ 
+end)
+ 
+ 
+ 
+RunService:BindToRenderStep("AimLock", 0, function()
+ 
+    if (DaHoodSettings.AimLock and Aiming.Check() and UserInputService:IsKeyDown(DaHoodSettings.AimLockKeybind)) then
+ 
+        local SelectedPart = Aiming.SelectedPart
+ 
+        local Hit = SelectedPart.CFrame + (SelectedPart.Velocity * DaHoodSettings.Prediction)
+ 
+        CurrentCamera.CFrame = CFrame.lookAt(CurrentCamera.CFrame.Position, Hit.Position)
+ 
+    end
+end)
+
+BulletColor = true
+
+if BulletColor == true then
+bullet_tracer_color = Color3.fromRGB(255, 255, 255)
+function GetGun()
+    if game.Players.LocalPlayer.Character then
+        for i, v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+            if v:FindFirstChild 'Ammo' then
+                return v
+            end
+        end
+    end
+    return nil
+end
+
+local Services = {
+    Players = game:GetService("Players"),
+    UserInputService = game:GetService("UserInputService"),
+    RunService = game:GetService("RunService"),
+}
+
+local Local = {
+    Player = Services.Players.LocalPlayer,
+    Mouse = Services.Players.LocalPlayer:GetMouse(),
+}
+local Other = {
+    Camera = workspace.CurrentCamera,
+    BeamPart = Instance.new("Part", workspace)
+}
+
+Other.BeamPart.Name = "BeamPart"
+Other.BeamPart.Transparency = 1
+local Settings = {
+    StartColor = MainAccentColor,
+    EndColor = MainAccentColor,
+    StartWidth = 4,
+    EndWidth = 4,
+    ShowImpactPoint = true,
+    ImpactTransparency = 0.2,
+    ImpactColor = Color3.new(255, 255, 255),
+    Time = 0.435,
+}
+game:GetService "RunService".Heartbeat:Connect(function()
+    if game:GetService("Workspace").Ignored:FindFirstChild 'BULLET_RAYS' and BulletColor then
+        game:GetService("Workspace").Ignored.BULLET_RAYS:Destroy()
+    end
+end)
+local funcs = {}
+Local.Mouse.TargetFilter = Other.BeamPart
+function funcs:Beam(v1, v2)
+    v2 = Vector3.new(v2.X - 0.1, v2.Y + 0.2, v2.Z)
+    local colorSequence = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, bullet_tracer_color),
+        ColorSequenceKeypoint.new(1, bullet_tracer_color),
+    })
+    local Part = Instance.new("Part", Other.BeamPart)
+    Part.Size = Vector3.new(255, 255, 255)
+    Part.Massless = true
+    Part.Transparency = 1
+    Part.CanCollide = false
+    Part.Position = v1
+    Part.Anchored = true
+    local Attachment = Instance.new("Attachment", Part)
+    local Part2 = Instance.new("Part", Other.BeamPart)
+    Part2.Size = Vector3.new(255, 255, 255)
+    Part2.Transparency = 1
+    Part2.CanCollide = false
+    Part2.Position = v2
+    Part2.Anchored = true
+    Part2.Material = Enum.Material.Plastic
+    Part2.Color = Settings.ImpactColor
+    Part2.Massless = true
+    local Attachment2 = Instance.new("Attachment", Part2)
+    local Beam = Instance.new("Beam", Part)
+    Beam.FaceCamera = true
+    Beam.Color = colorSequence
+    Beam.Attachment0 = Attachment
+    Beam.Attachment1 = Attachment2
+    Beam.LightEmission = 6
+    Beam.LightInfluence = 1
+    Beam.Width0 = 0.05
+    Beam.Width1 =  0.05
+    Beam.Texture = "http://www.roblox.com/asset/?id=5210472215"
+    Beam.TextureSpeed = 0
+    Beam.TextureLength = 0
+    delay(Settings.Time, function()
+        Part:Destroy()
+        Part2:Destroy()
+    end)
+end
+
+spawn(function()
+    while task.wait(0.5) do
+        gun = GetGun()
+        if gun then
+            LastAmmo = gun.Ammo.Value
+            gun.Ammo:GetPropertyChangedSignal("Value"):Connect(function()
+                if BulletColor and gun.Ammo.Value < LastAmmo then
+                    LastAmmo = gun.Ammo.Value
+                    funcs:Beam(gun.Handle.Position, Local.Mouse.hit.p)
+                end
+            end)
+        end
+    end
+end)
+
+local a = "[Revolver]"
+end
+
+    Mouse.KeyDown:Connect(
+        function(Key)
+            if Key == getgenv().MacroKey then
+                SpeedGlitch = not SpeedGlitch
+                if SpeedGlitch == true then
+                    repeat
+                        game:GetService("RunService").Heartbeat:wait()
+                        keypress(0x49)
+                        game:GetService("RunService").Heartbeat:wait()
+                        keypress(0x4F)
+                        game:GetService("RunService").Heartbeat:wait()
+                        keyrelease(0x49)
+                        game:GetService("RunService").Heartbeat:wait()
+                        keyrelease(0x4F)
+                        game:GetService("RunService").Heartbeat:wait()
+                    until SpeedGlitch == false
+                end
+            end
+        end
+    )
+    
+    local mouseyea = game.Players.LocalPlayer:GetMouse()
+    mouseyea.KeyDown:Connect(
+        function(ToggleKey)
+            if ToggleKey ==  getgenv().FovKey then
+                if Aiming.FOV == 70 then
+                    Aiming.FOV = 0
+                    small:Play()
+                else
+                    Aiming.FOV = 70
+                    big:Play()
+                end
+            end
+        end
+    )
